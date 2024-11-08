@@ -1,0 +1,513 @@
+Index: src/main/java/com/example/pruebalaboratorio1/beans/streaming.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.example.pruebalaboratorio1.beans;\r\n\r\npublic class streaming {\r\n\r\n\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/com/example/pruebalaboratorio1/beans/streaming.java b/src/main/java/com/example/pruebalaboratorio1/beans/streaming.java
+--- a/src/main/java/com/example/pruebalaboratorio1/beans/streaming.java	(revision c05667f7d1e4363a21795eb45d2c232efbb80253)
++++ b/src/main/java/com/example/pruebalaboratorio1/beans/streaming.java	(date 1730996117751)
+@@ -1,6 +1,22 @@
+ package com.example.pruebalaboratorio1.beans;
+ 
+ public class streaming {
++    private int idStreaming;
++    private String nombreServicio;
++
+ 
++    public int getIsStreaming() {
++        return idStreaming;
++    }
++
++    public void setIsStreaming(int isStreaming) {
++        this.idStreaming = isStreaming;
++    }
++    public String getNombreServicio() {
++        return nombreServicio;
++    }
++    public void setNombreServicio(String nombreServicio) {
++        this.nombreServicio = nombreServicio;
++    }
+ 
+ }
+Index: src/main/java/com/example/pruebalaboratorio1/daos/peliculaDao.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.example.pruebalaboratorio1.daos;\r\n\r\nimport com.example.pruebalaboratorio1.beans.genero;\r\nimport com.example.pruebalaboratorio1.beans.pelicula;\r\nimport com.example.pruebalaboratorio1.beans.streaming;\r\n\r\nimport java.sql.*;\r\nimport java.util.ArrayList;\r\n\r\npublic class peliculaDao extends baseDao{\r\n\r\n    public ArrayList<pelicula> listarPeliculas() {\r\n\r\n        ArrayList<pelicula> listaPeliculas = new ArrayList<>();\r\n\r\n        try {\r\n            Class.forName(\"com.mysql.cj.jdbc.Driver\");\r\n        } catch (ClassNotFoundException e) {\r\n            throw new RuntimeException(e);\r\n        }\r\n\r\n        String url = \"jdbc:mysql://localhost:3306/mydb?serverTimezone=America/Lima\";\r\n        String username = \"root\";\r\n        String password = \"root\";\r\n\r\n        try {\r\n            Connection conn = DriverManager.getConnection(url, username, password);\r\n            Statement stmt = conn.createStatement();\r\n\r\n            String sql = \"SELECT A.*, B.NOMBRE, C.NOMBRESERVICIO FROM  \\n\" +\r\n                    \"(SELECT * FROM PELICULA ) AS A \\n\" +\r\n                    \"INNER JOIN \\n\" +\r\n                    \"(SELECT * FROM GENERO) AS B\\n\" +\r\n                    \"ON A.IDGENERO = B.IDGENERO\\n\" +\r\n                    \"INNER JOIN \\n\" +\r\n                    \"(SELECT * FROM STREAMING) AS C\\n\" +\r\n                    \"ON A.IDSTREAMING = C.IDSTREAMING\\n\" +\r\n                    \"ORDER BY RATING DESC , BOXOFFICE DESC\";\r\n\r\n\r\n            ResultSet rs = stmt.executeQuery(sql);\r\n\r\n            while (rs.next()) {\r\n                pelicula movie = new pelicula();\r\n                genero genero = new genero();\r\n                streaming streaming = new streaming();\r\n                int idPelicula = rs.getInt(1);\r\n                movie.setIdPelicula(idPelicula);\r\n                String titulo = rs.getString(\"titulo\");\r\n                movie.setTitulo(titulo);\r\n                String director = rs.getString(\"director\");\r\n                movie.setDirector(director);\r\n                int anoPublicacion = rs.getInt(\"anoPublicacion\");\r\n                movie.setAnoPublicacion(anoPublicacion);\r\n                double rating = rs.getDouble(\"rating\");\r\n                movie.setRating(rating);\r\n                double boxOffice = rs.getDouble(\"boxOffice\");\r\n                movie.setBoxOffice(boxOffice);\r\n                int idGenero = rs.getInt(\"idGenero\");\r\n                String nombregenero = rs.getString(\"nombre\");\r\n                movie.setGenero(nombregenero);\r\n\r\n\r\n                //boolean validador= validarBorrado(movie);\r\n                //movie.setValidadorBorrado(validador);\r\n\r\n                listaPeliculas.add(movie);\r\n\r\n            }\r\n\r\n        } catch (SQLException e) {\r\n            throw new RuntimeException(e);\r\n        }\r\n\r\n        return listaPeliculas;\r\n    }\r\n\r\n    public ArrayList<pelicula> listarPeliculasFiltradas(int idGenero, int idStreaming) {\r\n\r\n        ArrayList<pelicula> listaPeliculasFiltradas= new ArrayList<>();\r\n\r\n\r\n        return listaPeliculasFiltradas;\r\n    }\r\n\r\n    // AGREGAR CAMPOS FALTANTES (GENERO, STREAMING)\r\n    public void editarPelicula(int idPelicula, String titulo, String director, int anoPublicacion, double rating, double boxOffice){\r\n        try {\r\n            String url = \"jdbc:mysql://localhost:3306/mydb?serverTimezone=America/Lima\";\r\n            String username = \"root\";\r\n            String password = \"root\";\r\n\r\n            Class.forName(\"com.mysql.cj.jdbc.Driver\");\r\n            try (Connection conn = DriverManager.getConnection(url, username, password);) {\r\n                String sql = \"UPDATE PELICULA SET titulo = ?, director = ?, anoPublicacion = ? ,\" +\r\n                        \"rating = ?, boxOffice = ? WHERE IDPELICULA = ?\";\r\n                try (PreparedStatement pstmt = conn.prepareStatement(sql)) {\r\n                    pstmt.setString(1, titulo);\r\n                    pstmt.setString(2, director);\r\n                    pstmt.setInt(3, anoPublicacion);\r\n                    pstmt.setDouble(4, rating);\r\n                    pstmt.setDouble(5, boxOffice);\r\n                    pstmt.setInt(6, idPelicula);\r\n                    pstmt.executeUpdate();\r\n                }\r\n            }\r\n        } catch (SQLException | ClassNotFoundException e) {\r\n            e.printStackTrace();\r\n        }\r\n\r\n\r\n    }\r\n\r\n\r\n    public void borrarPelicula(int idPelicula) {\r\n\r\n        // NOTA: PARA BORRAR UNA PELICULA CORRECTAMENTE NO OLVIDAR PRIMERO BORRARLA DE LA TABLA PROTAGONSITAS\r\n\r\n\r\n    }\r\n\r\n\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/com/example/pruebalaboratorio1/daos/peliculaDao.java b/src/main/java/com/example/pruebalaboratorio1/daos/peliculaDao.java
+--- a/src/main/java/com/example/pruebalaboratorio1/daos/peliculaDao.java	(revision c05667f7d1e4363a21795eb45d2c232efbb80253)
++++ b/src/main/java/com/example/pruebalaboratorio1/daos/peliculaDao.java	(date 1730996098247)
+@@ -7,10 +7,22 @@
+ import java.sql.*;
+ import java.util.ArrayList;
+ 
+-public class peliculaDao extends baseDao{
++public class peliculaDao extends baseDao {
+ 
++    @Override
++    public boolean validarBorrado(pelicula movie) {
++        try {
++            // Convertir la duración a un número entero
++            int duracion = Integer.parseInt(movie.getDuracion().replaceAll("[^0-9]", ""));
++            // Validar que la duración sea mayor a 120 minutos y que no haya ganado un premio Oscar
++            return duracion > 120 && !movie.isPremioOscar();
++        } catch (NumberFormatException e) {
++            // Si no se puede convertir la duración, retorna false
++            return false;
++        }
++    }
++
+     public ArrayList<pelicula> listarPeliculas() {
+-
+         ArrayList<pelicula> listaPeliculas = new ArrayList<>();
+ 
+         try {
+@@ -23,51 +35,41 @@
+         String username = "root";
+         String password = "root";
+ 
+-        try {
+-            Connection conn = DriverManager.getConnection(url, username, password);
++        try (Connection conn = DriverManager.getConnection(url, username, password)) {
+             Statement stmt = conn.createStatement();
+-
+-            String sql = "SELECT A.*, B.NOMBRE, C.NOMBRESERVICIO FROM  \n" +
+-                    "(SELECT * FROM PELICULA ) AS A \n" +
+-                    "INNER JOIN \n" +
+-                    "(SELECT * FROM GENERO) AS B\n" +
+-                    "ON A.IDGENERO = B.IDGENERO\n" +
+-                    "INNER JOIN \n" +
+-                    "(SELECT * FROM STREAMING) AS C\n" +
+-                    "ON A.IDSTREAMING = C.IDSTREAMING\n" +
+-                    "ORDER BY RATING DESC , BOXOFFICE DESC";
++            String sql = "SELECT A.*, B.NOMBRE AS nombreGenero, C.NOMBRESERVICIO FROM " +
++                    "PELICULA A " +
++                    "INNER JOIN GENERO B ON A.IDGENERO = B.IDGENERO " +
++                    "INNER JOIN STREAMING C ON A.IDSTREAMING = C.IDSTREAMING " +
++                    "ORDER BY RATING DESC, BOXOFFICE DESC";
+ 
+-
+             ResultSet rs = stmt.executeQuery(sql);
+ 
+             while (rs.next()) {
+                 pelicula movie = new pelicula();
+                 genero genero = new genero();
+                 streaming streaming = new streaming();
+-                int idPelicula = rs.getInt(1);
+-                movie.setIdPelicula(idPelicula);
+-                String titulo = rs.getString("titulo");
+-                movie.setTitulo(titulo);
+-                String director = rs.getString("director");
+-                movie.setDirector(director);
+-                int anoPublicacion = rs.getInt("anoPublicacion");
+-                movie.setAnoPublicacion(anoPublicacion);
+-                double rating = rs.getDouble("rating");
+-                movie.setRating(rating);
+-                double boxOffice = rs.getDouble("boxOffice");
+-                movie.setBoxOffice(boxOffice);
+-                int idGenero = rs.getInt("idGenero");
+-                String nombregenero = rs.getString("nombre");
+-                movie.setGenero(nombregenero);
++
++                movie.setIdPelicula(rs.getInt("idPelicula"));
++                movie.setTitulo(rs.getString("titulo"));
++                movie.setDirector(rs.getString("director"));
++                movie.setAnoPublicacion(rs.getInt("anoPublicacion"));
++                movie.setRating(rs.getDouble("rating"));
++                movie.setBoxOffice(rs.getDouble("boxOffice"));
+ 
++                genero.setIdGenero(rs.getInt("idGenero"));
++                genero.setNombre(rs.getString("nombreGenero"));
++                movie.setGenero(genero);
+ 
+-                //boolean validador= validarBorrado(movie);
+-                //movie.setValidadorBorrado(validador);
++                streaming.setIdStreaming(rs.getInt("idStreaming"));
++                streaming.setNombreServicio(rs.getString("nombreServicio"));
++                movie.setStreaming(streaming);
++
++                movie.setDuracion(rs.getString("duracion"));
++                movie.setPremioOscar(rs.getBoolean("premioOscar"));
+ 
+                 listaPeliculas.add(movie);
+-
+             }
+-
+         } catch (SQLException e) {
+             throw new RuntimeException(e);
+         }
+@@ -76,48 +78,104 @@
+     }
+ 
+     public ArrayList<pelicula> listarPeliculasFiltradas(int idGenero, int idStreaming) {
+-
+-        ArrayList<pelicula> listaPeliculasFiltradas= new ArrayList<>();
+-
+-
++        ArrayList<pelicula> listaPeliculasFiltradas = new ArrayList<>();
++        // Implementa la lógica para filtrar películas según idGenero e idStreaming
+         return listaPeliculasFiltradas;
+     }
+ 
+-    // AGREGAR CAMPOS FALTANTES (GENERO, STREAMING)
+-    public void editarPelicula(int idPelicula, String titulo, String director, int anoPublicacion, double rating, double boxOffice){
+-        try {
+-            String url = "jdbc:mysql://localhost:3306/mydb?serverTimezone=America/Lima";
+-            String username = "root";
+-            String password = "root";
++    public void editarPelicula(int idPelicula, String titulo, String director, int anoPublicacion, double rating, double boxOffice, int idGenero, int idStreaming) {
++        String url = "jdbc:mysql://localhost:3306/mydb?serverTimezone=America/Lima";
++        String username = "root";
++        String password = "root";
+ 
++        try {
+             Class.forName("com.mysql.cj.jdbc.Driver");
+-            try (Connection conn = DriverManager.getConnection(url, username, password);) {
+-                String sql = "UPDATE PELICULA SET titulo = ?, director = ?, anoPublicacion = ? ," +
+-                        "rating = ?, boxOffice = ? WHERE IDPELICULA = ?";
++            try (Connection conn = DriverManager.getConnection(url, username, password)) {
++                String sql = "UPDATE PELICULA SET titulo = ?, director = ?, anoPublicacion = ?, " +
++                        "rating = ?, boxOffice = ?, idGenero = ?, idStreaming = ? WHERE idPelicula = ?";
+                 try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+                     pstmt.setString(1, titulo);
+                     pstmt.setString(2, director);
+                     pstmt.setInt(3, anoPublicacion);
+                     pstmt.setDouble(4, rating);
+                     pstmt.setDouble(5, boxOffice);
+-                    pstmt.setInt(6, idPelicula);
++                    pstmt.setInt(6, idGenero);
++                    pstmt.setInt(7, idStreaming);
++                    pstmt.setInt(8, idPelicula);
+                     pstmt.executeUpdate();
+                 }
+             }
+         } catch (SQLException | ClassNotFoundException e) {
+             e.printStackTrace();
+         }
+-
+-
+     }
+-
+ 
+     public void borrarPelicula(int idPelicula) {
++        String url = "jdbc:mysql://localhost:3306/mydb?serverTimezone=America/Lima";
++        String username = "root";
++        String password = "root";
+ 
+-        // NOTA: PARA BORRAR UNA PELICULA CORRECTAMENTE NO OLVIDAR PRIMERO BORRARLA DE LA TABLA PROTAGONSITAS
++        try {
++            Class.forName("com.mysql.cj.jdbc.Driver");
++            try (Connection conn = DriverManager.getConnection(url, username, password)) {
++                // Obtener la película para validar si puede ser borrada
++                pelicula movie = obtenerPeliculaPorId(idPelicula); // Método que debes implementar
++                boolean puedeBorrarse = validarBorrado(movie);
+ 
++                if (puedeBorrarse) {
++                    // Eliminar referencias de la tabla PROTAGONISTAS
++                    String sqlDeleteProtagonistas = "DELETE FROM PROTAGONISTAS WHERE idPelicula = ?";
++                    try (PreparedStatement pstmt = conn.prepareStatement(sqlDeleteProtagonistas)) {
++                        pstmt.setInt(1, idPelicula);
++                        pstmt.executeUpdate();
++                    }
+ 
++                    // Luego, eliminar la película de la tabla PELICULA
++                    String sqlDeletePelicula = "DELETE FROM PELICULA WHERE idPelicula = ?";
++                    try (PreparedStatement pstmt = conn.prepareStatement(sqlDeletePelicula)) {
++                        pstmt.setInt(1, idPelicula);
++                        pstmt.executeUpdate();
++                    }
++                } else {
++                    System.out.println("La película no cumple con los requisitos para ser borrada.");
++                }
++            }
++        } catch (SQLException | ClassNotFoundException e) {
++            e.printStackTrace();
++        }
+     }
++
++    public pelicula obtenerPeliculaPorId(int idPelicula) {
++        pelicula movie = new pelicula();
++        String url = "jdbc:mysql://localhost:3306/mydb?serverTimezone=America/Lima";
++        String username = "root";
++        String password = "root";
++
++        try {
++            Class.forName("com.mysql.cj.jdbc.Driver");
++            try (Connection conn = DriverManager.getConnection(url, username, password)) {
++                String sql = "SELECT * FROM PELICULA WHERE idPelicula = ?";
++                try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
++                    pstmt.setInt(1, idPelicula);
++                    ResultSet rs = pstmt.executeQuery();
+ 
++                    if (rs.next()) {
++                        movie.setIdPelicula(rs.getInt("idPelicula"));
++                        movie.setTitulo(rs.getString("titulo"));
++                        movie.setDirector(rs.getString("director"));
++                        movie.setAnoPublicacion(rs.getInt("anoPublicacion"));
++                        movie.setRating(rs.getDouble("rating"));
++                        movie.setBoxOffice(rs.getDouble("boxOffice"));
++                        movie.setDuracion(rs.getString("duracion"));
++                        movie.setPremioOscar(rs.getBoolean("premioOscar"));
++                        // Asigna otros atributos si es necesario
++                    }
++                }
++            }
++        } catch (SQLException | ClassNotFoundException e) {
++            e.printStackTrace();
++        }
+ 
++        return movie;
++    }
+ }
+Index: src/main/java/com/example/pruebalaboratorio1/beans/pelicula.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.example.pruebalaboratorio1.beans;\r\n\r\npublic class pelicula {\r\n\r\n    private int idPelicula;\r\n    private String titulo;\r\n\r\n    private String director;\r\n    private int anoPublicacion;\r\n    private Double rating;\r\n    private double boxOffice;\r\n    private String genero;\r\n    private String streaming;\r\n    private String duracion;\r\n    private boolean premioOscar;\r\n\r\n    public int getIdPelicula() {\r\n        return idPelicula;\r\n    }\r\n\r\n    public void setIdPelicula(int idPelicula) {\r\n        this.idPelicula = idPelicula;\r\n    }\r\n\r\n    public String getTitulo() {\r\n        return titulo;\r\n    }\r\n\r\n    public void setTitulo(String titulo) {\r\n        this.titulo = titulo;\r\n    }\r\n\r\n    public String getDirector() {\r\n        return director;\r\n    }\r\n\r\n    public void setDirector(String director) {\r\n        this.director = director;\r\n    }\r\n\r\n    public int getAnoPublicacion() {\r\n        return anoPublicacion;\r\n    }\r\n\r\n    public void setAnoPublicacion(int anoPublicacion) {\r\n        this.anoPublicacion = anoPublicacion;\r\n    }\r\n\r\n    public Double getRating() {\r\n        return rating;\r\n    }\r\n\r\n    public void setRating(Double rating) {\r\n        this.rating = rating;\r\n    }\r\n\r\n    public double getBoxOffice() {\r\n        return boxOffice;\r\n    }\r\n\r\n    public void setBoxOffice(double boxOffice) {\r\n        this.boxOffice = boxOffice;\r\n    }\r\n\r\n    public String getGenero() {\r\n        return genero;\r\n    }\r\n\r\n    public void setGenero(String genero) {\r\n        this.genero = genero;\r\n    }\r\n\r\n    public String getStreaming() {\r\n        return streaming;\r\n    }\r\n\r\n    public void setStreaming(String streaming) {\r\n        this.streaming = streaming;\r\n    }\r\n\r\n    public String getDuracion() {\r\n        return duracion;\r\n    }\r\n\r\n    public void setDuracion(String duracion) {\r\n        this.duracion = duracion;\r\n    }\r\n\r\n    public boolean isPremioOscar() {\r\n        return premioOscar;\r\n    }\r\n\r\n    public void setPremioOscar(boolean premioOscar) {\r\n        this.premioOscar = premioOscar;\r\n    }\r\n\r\n    // private boolean validadorBorrado;\r\n\r\n\r\n\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/com/example/pruebalaboratorio1/beans/pelicula.java b/src/main/java/com/example/pruebalaboratorio1/beans/pelicula.java
+--- a/src/main/java/com/example/pruebalaboratorio1/beans/pelicula.java	(revision c05667f7d1e4363a21795eb45d2c232efbb80253)
++++ b/src/main/java/com/example/pruebalaboratorio1/beans/pelicula.java	(date 1730994911768)
+@@ -1,5 +1,7 @@
+ package com.example.pruebalaboratorio1.beans;
+ 
++import java.util.stream.Stream;
++
+ public class pelicula {
+ 
+     private int idPelicula;
+@@ -7,12 +9,20 @@
+ 
+     private String director;
+     private int anoPublicacion;
+-    private Double rating;
++    private double rating;
+     private double boxOffice;
+-    private String genero;
+-    private String streaming;
++    private Genero genero;
++    private Streaming streaming;
+     private String duracion;
+     private boolean premioOscar;
++    private boolean validador;
++
++    public boolean isValidador() {
++        return validador;
++    }
++    public void setValidador(boolean validador) {
++        this.validador = validador;
++    }
+ 
+     public int getIdPelicula() {
+         return idPelicula;
+@@ -62,19 +72,19 @@
+         this.boxOffice = boxOffice;
+     }
+ 
+-    public String getGenero() {
++    public Genero getGenero() {
+         return genero;
+     }
+ 
+-    public void setGenero(String genero) {
++    public void setGenero(Genero genero) {
+         this.genero = genero;
+     }
+ 
+-    public String getStreaming() {
++    public Streaming getStreaming() {
+         return streaming;
+     }
+ 
+-    public void setStreaming(String streaming) {
++    public void setStreaming(Streaming streaming) {
+         this.streaming = streaming;
+     }
+ 
+Index: src/main/webapp/detalles.jsp
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><%@page import=\"java.util.ArrayList\"%>\r\n<%@page import=\"com.example.pruebalaboratorio1.beans.pelicula\"%>\r\n<%@page import=\"java.text.NumberFormat\"%>\r\n<%@ page import=\"com.example.pruebalaboratorio1.beans.genero\" %>\r\n<%@ page import=\"com.example.pruebalaboratorio1.beans.streaming\" %>\r\n<%@page contentType=\"text/html\" pageEncoding=\"UTF-8\"%>\r\n<%\r\n\r\n    pelicula movie = (pelicula) request.getAttribute(\"pelicula\");\r\n    String searchTerm = request.getParameter(\"searchTerm\");\r\n    NumberFormat formatter = NumberFormat.getInstance();\r\n    //ArrayList<genero> listaGeneros = (ArrayList) request.getAttribute(\"listaGeneros\");\r\n    //ArrayList<streaming> listaStreaming = (ArrayList) request.getAttribute(\"listaStreaming\");\r\n%>\r\n<!DOCTYPE html>\r\n<html>\r\n<head>\r\n    <meta charset=\"UTF-8\">\r\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\r\n    <title><%=movie.getTitulo()%></title>\r\n</head>\r\n<body>\r\n\r\n<h1>Pelicula Numero <%=movie.getIdPelicula()%></h1>\r\n\r\n<table border=\"1\">\r\n    <form action=\"listaPeliculas\" method=\"POST\">\r\n        <input type=\"hidden\" name=\"idPelicula\" value=\"<%=movie.getIdPelicula()%>\">\r\n        <tr>\r\n            <th>Titulo</th>\r\n            <td contenteditable>\r\n                <input name=\"titulo\" value=\"<%=movie.getTitulo()%>\">\r\n            </td>\r\n        </tr>\r\n        <tr>\r\n            <th>Director</th>\r\n            <td contenteditable>\r\n                <input name=\"director\" value=\"<%=movie.getDirector()%>\">\r\n            </td>\r\n        </tr>\r\n        <tr>\r\n            <th>Año Publicacion</th>\r\n            <td contenteditable>\r\n                <input name=\"anoPublicacion\" value=\"<%=movie.getAnoPublicacion()%>\">\r\n            </td>\r\n        </tr>\r\n        <tr>\r\n            <th>Rating</th>\r\n            <td contenteditable>\r\n                <input name=\"rating\" value=\"<%=movie.getRating()%>\">\r\n            </td>\r\n        </tr>\r\n        <tr>\r\n            <th>BoxOffice</th>\r\n            <td contenteditable>\r\n                <input name=\"boxOffice\" value=\"<%=movie.getBoxOffice()%>\">\r\n            </td>\r\n        </tr>\r\n        <tr>\r\n            <th>Genero</th>\r\n            <td contenteditable>\r\n                <input name=\"Genero\" value=\"<%=movie.getGenero()%>\">\r\n            </td>\r\n        </tr>\r\n        <tr>\r\n            <th>Actores</th>\r\n            <td><a href=\"listaActores?idPelicula=<%= movie.getIdPelicula() %>\">Ver Actores</a></td>\r\n        </tr>\r\n        <input type=\"hidden\" name=\"action\" value=\"editar\">\r\n        <button type=\"submit\">Editar Pelicula</button>\r\n    </form>\r\n</table>\r\n\r\n\r\n</body>\r\n</html>\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/webapp/detalles.jsp b/src/main/webapp/detalles.jsp
+--- a/src/main/webapp/detalles.jsp	(revision c05667f7d1e4363a21795eb45d2c232efbb80253)
++++ b/src/main/webapp/detalles.jsp	(date 1730992383935)
+@@ -5,72 +5,69 @@
+ <%@ page import="com.example.pruebalaboratorio1.beans.streaming" %>
+ <%@page contentType="text/html" pageEncoding="UTF-8"%>
+ <%
+-
+     pelicula movie = (pelicula) request.getAttribute("pelicula");
+-    String searchTerm = request.getParameter("searchTerm");
+     NumberFormat formatter = NumberFormat.getInstance();
+-    //ArrayList<genero> listaGeneros = (ArrayList) request.getAttribute("listaGeneros");
+-    //ArrayList<streaming> listaStreaming = (ArrayList) request.getAttribute("listaStreaming");
+ %>
+ <!DOCTYPE html>
+ <html>
+-<head>
+-    <meta charset="UTF-8">
+-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+-    <title><%=movie.getTitulo()%></title>
+-</head>
+-<body>
++    <head>
++        <meta charset="UTF-8">
++        <meta name="viewport" content="width=device-width, initial-scale=1.0">
++        <title><%= movie.getTitulo() %></title>
++    </head>
++    <body>
+ 
+-<h1>Pelicula Numero <%=movie.getIdPelicula()%></h1>
++        <h1>Pelicula Número <%= movie.getIdPelicula() %></h1>
+ 
+-<table border="1">
+-    <form action="listaPeliculas" method="POST">
+-        <input type="hidden" name="idPelicula" value="<%=movie.getIdPelicula()%>">
+-        <tr>
+-            <th>Titulo</th>
+-            <td contenteditable>
+-                <input name="titulo" value="<%=movie.getTitulo()%>">
+-            </td>
+-        </tr>
+-        <tr>
+-            <th>Director</th>
+-            <td contenteditable>
+-                <input name="director" value="<%=movie.getDirector()%>">
+-            </td>
+-        </tr>
+-        <tr>
+-            <th>Año Publicacion</th>
+-            <td contenteditable>
+-                <input name="anoPublicacion" value="<%=movie.getAnoPublicacion()%>">
+-            </td>
+-        </tr>
+-        <tr>
+-            <th>Rating</th>
+-            <td contenteditable>
+-                <input name="rating" value="<%=movie.getRating()%>">
+-            </td>
+-        </tr>
+-        <tr>
+-            <th>BoxOffice</th>
+-            <td contenteditable>
+-                <input name="boxOffice" value="<%=movie.getBoxOffice()%>">
+-            </td>
+-        </tr>
+-        <tr>
+-            <th>Genero</th>
+-            <td contenteditable>
+-                <input name="Genero" value="<%=movie.getGenero()%>">
+-            </td>
+-        </tr>
+-        <tr>
+-            <th>Actores</th>
+-            <td><a href="listaActores?idPelicula=<%= movie.getIdPelicula() %>">Ver Actores</a></td>
+-        </tr>
+-        <input type="hidden" name="action" value="editar">
+-        <button type="submit">Editar Pelicula</button>
+-    </form>
+-</table>
++        <table border="1">
++            <form action="listaPeliculas" method="POST">
++                <input type="hidden" name="idPelicula" value="<%= movie.getIdPelicula() %>">
++                <tr>
++                    <th>Título</th>
++                    <td>
++                        <input name="titulo" value="<%= movie.getTitulo() %>">
++                    </td>
++                </tr>
++                <tr>
++                    <th>Director</th>
++                    <td>
++                        <input name="director" value="<%= movie.getDirector() %>">
++                    </td>
++                </tr>
++                <tr>
++                    <th>Año Publicación</th>
++                    <td>
++                        <input name="anoPublicacion" value="<%= movie.getAnoPublicacion() %>">
++                    </td>
++                </tr>
++                <tr>
++                    <th>Rating</th>
++                    <td>
++                        <input name="rating" value="<%= movie.getRating() %>">
++                    </td>
++                </tr>
++                <tr>
++                    <th>Box Office</th>
++                    <td>
++                        <input name="boxOffice" value="<%= movie.getBoxOffice() %>">
++                    </td>
++                </tr>
++                <tr>
++                    <th>Género</th>
++                    <td>
++                        <input name="genero" value="<%= movie.getGenero().getNombre() %>">
++                    </td>
++                </tr>
++                <tr>
++                    <th>Actores</th>
++                    <td><a href="listaActores?idPelicula=<%= movie.getIdPelicula() %>">Ver Actores</a></td>
++                </tr>
++
++
++                <input type="hidden" name="action" value="editar">
++                <button type="submit">Editar Película</button>
++            </form>
++        </table>
+ 
+-
+-</body>
++    </body>
+ </html>
+Index: src/main/java/com/example/pruebalaboratorio1/daos/baseDao.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.example.pruebalaboratorio1.daos;\r\n\r\nimport com.example.pruebalaboratorio1.beans.pelicula;\r\n\r\nimport java.sql.Connection;\r\nimport java.sql.DriverManager;\r\nimport java.sql.SQLException;\r\n\r\npublic abstract class baseDao {\r\n\r\n\r\n\r\n    public boolean validarBorrado(pelicula movie) {\r\n        boolean validador = true;\r\n        return validador;\r\n    }\r\n}\r\n\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/com/example/pruebalaboratorio1/daos/baseDao.java b/src/main/java/com/example/pruebalaboratorio1/daos/baseDao.java
+--- a/src/main/java/com/example/pruebalaboratorio1/daos/baseDao.java	(revision c05667f7d1e4363a21795eb45d2c232efbb80253)
++++ b/src/main/java/com/example/pruebalaboratorio1/daos/baseDao.java	(date 1730993961713)
+@@ -2,17 +2,24 @@
+ 
+ import com.example.pruebalaboratorio1.beans.pelicula;
+ 
+-import java.sql.Connection;
+-import java.sql.DriverManager;
+-import java.sql.SQLException;
+-
+ public abstract class baseDao {
+ 
+-
+-
++    // Método para validar si una película se puede borrar
+     public boolean validarBorrado(pelicula movie) {
++        // Condición de ejemplo: la película solo se puede borrar si la duración es mayor de 100 minutos
++        // y no ha ganado un premio Oscar
+         boolean validador = true;
++
++        // Asegúrate de que la duración no sea nula y conviértela a un número
++        try {
++            int duracion = Integer.parseInt(movie.getDuracion().replaceAll("[^0-9]", ""));
++            if (duracion <= 100 || movie.isPremioOscar()) {
++                validador = false;
++            }
++        } catch (NumberFormatException e) {
++            validador = false; // Si no se puede convertir la duración, no se puede borrar
++        }
++
+         return validador;
+     }
+ }
+-
